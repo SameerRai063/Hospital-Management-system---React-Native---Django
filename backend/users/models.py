@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -10,10 +12,16 @@ class User(AbstractUser):
         ('patient', 'Patient'),
     ]
 
+    user_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='patient')
     phone_number = models.CharField(max_length=15, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.user_id:
+            self.user_id = f"USR-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.get_full_name() or self.username
