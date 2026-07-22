@@ -1,7 +1,6 @@
 from django.db import models
 
-from backend.users.models import User
-
+from users.models import User
 
 
 class Message(models.Model):
