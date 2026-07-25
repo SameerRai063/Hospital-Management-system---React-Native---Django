@@ -16,3 +16,11 @@ class PatientListView(ListAPIView):
     queryset = Patient.objects.select_related("user").all()
     serializer_class = PatientListSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+
+class PatientDetailView(RetrieveAPIView):
+    queryset = Patient.objects.select_related("user")
+    serializer_class = PatientDetailSerializer
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    lookup_field = "user__user_id"
+    lookup_url_kwarg = "user_id"
