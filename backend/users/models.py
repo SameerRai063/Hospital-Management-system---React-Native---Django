@@ -17,7 +17,11 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/",
+        blank=True,
+        null=True
+    )
     def save(self, *args, **kwargs):
         if not self.user_id:
             self.user_id = f"USR-{uuid.uuid4().hex[:8].upper()}"
@@ -26,6 +30,18 @@ class User(AbstractUser):
     def __str__(self):
         return self.get_full_name() or self.username
 
+class Patient(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='patient_profile')
+    date_of_birth = models.DateField(null=True, blank=True)
+    address = models.TextField(blank=True)
+    emergency_contact = models.CharField(max_length=15, blank=True)
+
+    class Meta:
+        verbose_name = 'Patient'
+        verbose_name_plural = 'Patients'
+
+    def __str__(self):
+        return f"Patient: {self.user.get_full_name() or self.user.username}"
 
 class Admin(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
@@ -52,15 +68,3 @@ class Doctor(models.Model):
         return f"Doctor: {self.user.get_full_name() or self.user.username}"
 
 
-class Patient(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='patient_profile')
-    date_of_birth = models.DateField(null=True, blank=True)
-    address = models.TextField(blank=True)
-    emergency_contact = models.CharField(max_length=15, blank=True)
-
-    class Meta:
-        verbose_name = 'Patient'
-        verbose_name_plural = 'Patients'
-
-    def __str__(self):
-        return f"Patient: {self.user.get_full_name() or self.user.username}"
