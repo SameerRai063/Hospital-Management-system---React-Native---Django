@@ -1,0 +1,66 @@
+from rest_framework import serializers
+from .models import User, Patient
+
+
+class PatientRegisterSerializer(serializers.ModelSerializer):
+    # User fields
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    class Meta:
+        model = Patient
+        fields = [
+            # User fields
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "password",
+            "phone_number",
+            "profile_picture",
+
+            # Patient fields
+            "date_of_birth",
+            "address",
+            "emergency_contact",
+        ]
+
+    phone_number = serializers.CharField(source="user.phone_number")
+    profile_picture = serializers.ImageField(
+        source="user.profile_picture",
+        required=False,
+        allow_null=True,
+    )
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists.")
+        return value
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already exists.")
+        return value
+
+    def create(self, validated_data):
+        user_data = validated_data.pop("user")
+
+        user = User.objects.create_user(
+            username=validated_data.pop("username"),
+            email=validated_data.pop("email"),
+            first_name=validated_data.pop("first_name"),
+            last_name=validated_data.pop("last_name"),
+            password=validated_data.pop("password"),
+            role="patient",
+            **user_data,
+        )
+
+        patient = Patient.objects.create(
+            user=user,
+            **validated_data,
+        )
+
+        return patient
