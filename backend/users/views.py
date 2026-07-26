@@ -35,3 +35,9 @@ class DoctorListAPIView(ListAPIView):
     queryset = Doctor.objects.select_related("user").all()
     serializer_class = DoctorSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+
+class DoctorDetailAPIView(RetrieveAPIView):
+    queryset = Doctor.objects.select_related("user").all()
+    serializer_class = DoctorSerializer
+    permission_classes = [IsAuthenticated, IsAdmin]
+    lookup_field = "id"
