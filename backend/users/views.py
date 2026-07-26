@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from backend.users.permissions import IsAdmin
 from backend.users.serializer import PatientRegisterSerializer
 from .models import Doctor, Patient
-from .serializer import DoctorCreateSerializer, PatientListSerializer
+from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer
 from .permissions import IsAdmin
 #Patient Views
 class PatientRegisterView(CreateAPIView):
@@ -29,4 +29,9 @@ class PatientDetailView(RetrieveAPIView):
 class DoctorCreateAPIView(CreateAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorCreateSerializer
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+class DoctorListAPIView(ListAPIView):
+    queryset = Doctor.objects.select_related("user").all()
+    serializer_class = DoctorSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
