@@ -11,6 +11,6 @@ urlpatterns = [
     ),
     path("register/", PatientRegisterView.as_view(), name="patient-register"),
     #Doctors URLS-------------------------------------------------------------------------------------------------------
-    path("doctors/", DoctorCreateAPIView.as_view(), name="doctor-create"),
-    
+    path("doctors/create/", DoctorCreateAPIView.as_view(), name="doctor-create"),
+
 ]
