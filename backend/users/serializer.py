@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Patient
+from .models import Doctor, User, Patient
 
 
 class PatientRegisterSerializer(serializers.ModelSerializer):
@@ -85,3 +85,48 @@ class PatientListSerializer(serializers.ModelSerializer):
             "address",
             "emergency_contact",
         ]
+
+#Doctor Serializer----------------------------------------------------------------------------------------------------------
+class DoctorCreateSerializer(serializers.ModelSerializer):
+    # User fields
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(write_only=True, min_length=8)
+    phone_number = serializers.CharField(required=False)
+
+    class Meta:
+        model = Doctor
+        fields = [
+            "username",
+            "password",
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "specialization",
+            "license_number",
+        ]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+
+        user = User.objects.create_user(
+            username=validated_data.pop("username"),
+            first_name=validated_data.pop("first_name"),
+            last_name=validated_data.pop("last_name"),
+            email=validated_data.pop("email", ""),
+            phone_number=validated_data.pop("phone_number", ""),
+            role="doctor",
+        )
+
+        user.set_password(password)
+        user.save()
+
+        doctor = Doctor.objects.create(
+            user=user,
+            **validated_data
+        )
+
+        return doctor

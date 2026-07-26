@@ -8,4 +8,5 @@ urlpatterns = [
         PatientDetailView.as_view(),
         name="patient-detail",
     ),
+    
 ]

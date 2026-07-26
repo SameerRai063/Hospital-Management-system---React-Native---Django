@@ -5,10 +5,10 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from backend.users.permissions import IsAdmin
 from backend.users.serializer import PatientRegisterSerializer
-from .models import Patient
-from .serializer import PatientListSerializer
+from .models import Doctor, Patient
+from .serializer import DoctorCreateSerializer, PatientListSerializer
 from .permissions import IsAdmin
-
+#Patient Views
 class PatientRegisterView(CreateAPIView):
     serializer_class = PatientRegisterSerializer
 
@@ -24,3 +24,9 @@ class PatientDetailView(RetrieveAPIView):
 
     lookup_field = "user__user_id"
     lookup_url_kwarg = "user_id"
+
+#Doctor Views------------------------------------------------------------------------------------------------------
+class DoctorCreateAPIView(CreateAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorCreateSerializer
+    permission_classes = [IsAuthenticated, IsAdmin]
