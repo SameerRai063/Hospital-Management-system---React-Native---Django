@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import DoctorCreateAPIView, DoctorDetailAPIView, DoctorListAPIView, PatientDetailView, PatientListView, PatientRegisterView
+from .views import DeletePatientAPIView, DoctorCreateAPIView, DoctorDetailAPIView, DoctorListAPIView, PatientDetailView, PatientListView, PatientRegisterView
 
 urlpatterns = [
     #Patients URLS-------------------------------------------------------------------------------------------------------
@@ -10,6 +10,11 @@ urlpatterns = [
         name="patient-detail",
     ),
     path("register/", PatientRegisterView.as_view(), name="patient-register"),
+    path(
+        "patients/<int:id>/delete/",
+        DeletePatientAPIView.as_view(),
+        name="delete-patient",
+    ),
     #Doctors URLS-------------------------------------------------------------------------------------------------------
     path("doctors/create/", DoctorCreateAPIView.as_view(), name="doctor-create"),
     path(

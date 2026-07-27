@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from backend.users.permissions import IsAdmin
 from backend.users.serializer import PatientRegisterSerializer
@@ -24,6 +24,20 @@ class PatientDetailView(RetrieveAPIView):
 
     lookup_field = "user__user_id"
     lookup_url_kwarg = "user_id"
+
+class DeletePatientAPIView(DestroyAPIView):
+    queryset = Patient.objects.select_related("user")
+    permission_classes = [IsAdmin]
+    lookup_field = "id"
+
+    def destroy(self, request, *args, **kwargs):
+        patient = self.get_object()
+        patient.user.delete()  # Deletes both User and Patient (CASCADE)
+
+        return Response(
+            {"message": "Patient deleted successfully."},
+            status=status.HTTP_200_OK
+        )
 
 #Doctor Views------------------------------------------------------------------------------------------------------
 class DoctorCreateAPIView(CreateAPIView):
