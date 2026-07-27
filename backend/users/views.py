@@ -1,12 +1,12 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from backend.users.permissions import IsAdmin
 from backend.users.serializer import PatientRegisterSerializer
 from .models import Doctor, Patient
-from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer
+from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer, UpdateDoctorSerializer
 from .permissions import IsAdmin
 #Patient Views
 class PatientRegisterView(CreateAPIView):
@@ -32,7 +32,7 @@ class DeletePatientAPIView(DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         patient = self.get_object()
-        patient.user.delete()  # Deletes both User and Patient (CASCADE)
+        patient.user.delete()  
 
         return Response(
             {"message": "Patient deleted successfully."},
@@ -54,4 +54,24 @@ class DoctorDetailAPIView(RetrieveAPIView):
     queryset = Doctor.objects.select_related("user").all()
     serializer_class = DoctorSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    lookup_field = "id"
+
+class DeleteDoctorAPIView(DestroyAPIView):
+    queryset = Doctor.objects.select_related("user")
+    permission_classes = [IsAdmin]
+    lookup_field = "id"
+
+    def destroy(self, request, *args, **kwargs):
+        doctor = self.get_object()
+        doctor.user.delete()  # Deletes both User and Doctor (CASCADE)
+
+        return Response(
+            {"message": "Doctor deleted successfully."},
+            status=status.HTTP_200_OK
+        )
+
+class UpdateDoctorAPIView(UpdateAPIView):
+    queryset = Doctor.objects.select_related("user")
+    serializer_class = UpdateDoctorSerializer
+    permission_classes = [IsAdmin]
     lookup_field = "id"
