@@ -7,7 +7,7 @@ from backend.users.permissions import IsAdmin
 from backend.users.serializer import PatientRegisterSerializer
 from .models import Doctor, Patient
 from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer, UpdateDoctorSerializer
-from .permissions import IsAdmin
+from .permissions import IsAdmin,IsAdminOrDoctorOwner
 #Patient Views
 class PatientRegisterView(CreateAPIView):
     serializer_class = PatientRegisterSerializer
@@ -73,5 +73,5 @@ class DeleteDoctorAPIView(DestroyAPIView):
 class UpdateDoctorAPIView(UpdateAPIView):
     queryset = Doctor.objects.select_related("user")
     serializer_class = UpdateDoctorSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrDoctorOwner]
     lookup_field = "id"

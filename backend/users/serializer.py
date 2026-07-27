@@ -176,13 +176,11 @@ class UpdateDoctorSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", {})
 
-        # Update User fields
         user = instance.user
         for attr, value in user_data.items():
             setattr(user, attr, value)
         user.save()
 
-        # Update Doctor fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
