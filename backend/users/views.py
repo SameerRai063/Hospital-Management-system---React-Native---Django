@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from backend.users.permissions import IsAdmin
 from backend.users.serializer import PatientRegisterSerializer
 from .models import Doctor, Patient
-from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer, UpdateDoctorSerializer
-from .permissions import IsAdmin,IsAdminOrDoctorOwner
+from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer, UpdateDoctorSerializer, UpdatePatientSerializer
+from .permissions import IsAdmin,IsAdminOrDoctorOwner, IsAdminOrPatientOwner
 #Patient Views
 class PatientRegisterView(CreateAPIView):
     serializer_class = PatientRegisterSerializer
@@ -38,6 +38,11 @@ class DeletePatientAPIView(DestroyAPIView):
             {"message": "Patient deleted successfully."},
             status=status.HTTP_200_OK
         )
+class UpdatePatientAPIView(UpdateAPIView):
+    queryset = Patient.objects.select_related("user")
+    serializer_class = UpdatePatientSerializer
+    permission_classes = [IsAuthenticated, IsAdminOrPatientOwner]
+    lookup_field = "id"
 
 #Doctor Views------------------------------------------------------------------------------------------------------
 class DoctorCreateAPIView(CreateAPIView):
