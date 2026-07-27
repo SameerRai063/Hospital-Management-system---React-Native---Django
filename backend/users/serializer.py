@@ -156,3 +156,35 @@ class DoctorSerializer(serializers.ModelSerializer):
             "specialization",
             "license_number",
         ]
+class UpdateDoctorSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source="user.first_name", required=False)
+    last_name = serializers.CharField(source="user.last_name", required=False)
+    email = serializers.EmailField(source="user.email", required=False)
+    phone_number = serializers.CharField(source="user.phone_number", required=False)
+
+    class Meta:
+        model = Doctor
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "specialization",
+            "license_number",
+        ]
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", {})
+
+        # Update User fields
+        user = instance.user
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        # Update Doctor fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
