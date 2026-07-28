@@ -3,8 +3,8 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from backend.users.permissions import IsAdmin
-from backend.users.serializer import PatientRegisterSerializer
+from users.permissions import IsAdmin
+from users.serializer import PatientRegisterSerializer
 from .models import Doctor, Patient
 from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer, UpdateDoctorSerializer, UpdatePatientSerializer
 from .permissions import IsAdmin,IsAdminOrDoctorOwner, IsAdminOrPatientOwner
