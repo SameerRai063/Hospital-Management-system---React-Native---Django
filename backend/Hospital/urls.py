@@ -1,8 +1,8 @@
-from django.conf.urls import include, static
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
 from Hospital import settings
 
 urlpatterns = [
@@ -14,8 +14,8 @@ urlpatterns = [
 
     # Apps
     path("api/users/", include("users.urls")),
-    path("api/appointments/", include("appointments.urls")),
-    path("api/reviews/", include("reviews.urls")),
+    #path("api/appointments/", include("appointments.urls")),
+    #path("api/reviews/", include("reviews.urls")),
 
     # Allauth
     path("accounts/", include("allauth.urls")),
