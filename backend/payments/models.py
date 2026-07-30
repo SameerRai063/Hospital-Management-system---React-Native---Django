@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import Patient
+from users.models import Doctor, Patient
 from appointments.models import Appointment
 # Create your models here.
 class Payment(models.Model):
@@ -12,12 +12,6 @@ class Payment(models.Model):
         Appointment,
         on_delete=models.CASCADE,
         related_name="payment"
-    )
-
-    patient = models.ForeignKey(
-        Patient,
-        on_delete=models.CASCADE,
-        related_name="payments"
     )
 
     transaction_id = models.CharField(
@@ -40,4 +34,31 @@ class Payment(models.Model):
     )
 
     def __str__(self):
-        return f"{self.transaction_id}"
+        return self.transaction_id
+class PendingPayment(models.Model):
+
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name="pending_payments"
+    )
+
+    doctor = models.ForeignKey(
+        Doctor,
+        on_delete=models.CASCADE,
+        related_name="pending_payments"
+    )
+
+    appointment_date = models.DateTimeField()
+
+    gateway_reference = models.CharField(
+        max_length=100,
+        unique=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.patient} -> {self.doctor}"
