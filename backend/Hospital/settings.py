@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'reviews',
     'chat',
     'consultation',
+    'payments',
 
         "allauth",
     "allauth.account",
