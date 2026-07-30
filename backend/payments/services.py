@@ -45,3 +45,24 @@ class KhaltiService:
         response.raise_for_status()
 
         return response.json()
+
+@staticmethod
+def verify_payment(pidx):
+
+    headers = {
+        "Authorization": f"Key {settings.KHALTI_SECRET_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    response = requests.post(
+        settings.KHALTI_VERIFY_URL,
+        json={
+            "pidx": pidx
+        },
+        headers=headers,
+        timeout=30,
+    )
+
+    response.raise_for_status()
+
+    return response.json()

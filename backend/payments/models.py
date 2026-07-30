@@ -52,9 +52,11 @@ class PendingPayment(models.Model):
     appointment_date = models.DateTimeField()
 
     gateway_reference = models.CharField(
-        max_length=100,
-        unique=True
-    )
+    max_length=100,
+    unique=True,
+    blank=True,
+    null=True
+)
 
     created_at = models.DateTimeField(
         auto_now_add=True
