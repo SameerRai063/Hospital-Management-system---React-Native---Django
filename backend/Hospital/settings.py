@@ -182,3 +182,17 @@ ACCOUNT_SIGNUP_FIELDS = [
 ]
 
 ACCOUNT_EMAIL_VERIFICATION = "optional"
+
+# Khalti Sandbox Credentials
+
+KHALTI_SECRET_KEY = "YOUR_KHALTI_TEST_SECRET_KEY"
+
+KHALTI_INITIATE_URL = "https://dev.khalti.com/api/v2/epayment/initiate/"
+
+KHALTI_VERIFY_URL = "https://dev.khalti.com/api/v2/epayment/lookup/"
+
+CONSULTATION_FEE = 500
+
+WEBSITE_URL = "http://localhost:8000"
+
+KHALTI_RETURN_URL = "http://localhost:8000/api/payments/callback/"
