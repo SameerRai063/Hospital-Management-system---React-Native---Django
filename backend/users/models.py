@@ -17,6 +17,7 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    email = models.EmailField(unique=True)
     profile_picture = models.ImageField(
         upload_to="profile_pictures/",
         blank=True,
@@ -35,6 +36,22 @@ class Patient(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
     emergency_contact = models.CharField(max_length=15, blank=True)
+    GENDER_CHOICES = [
+    ("male", "Male"),
+    ("female", "Female"),
+    ("other", "Other"),
+]
+
+    gender = models.CharField(
+    max_length=10,
+    choices=GENDER_CHOICES,
+    blank=True,
+    null=True
+)
+    blood_group = models.CharField(
+    max_length=5,
+    blank=True
+)
 
     class Meta:
         verbose_name = 'Patient'
@@ -59,6 +76,7 @@ class Doctor(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='doctor_profile')
     specialization = models.CharField(max_length=100)
     license_number = models.CharField(max_length=50, unique=True)
+    experience_years = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = 'Doctor'
