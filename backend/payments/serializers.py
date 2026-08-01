@@ -8,4 +8,4 @@ class PaymentInitiateSerializer(serializers.Serializer):
     appointment_date = serializers.DateTimeField()
 
 class PaymentVerifySerializer(serializers.Serializer):
-    pidx = serializers.CharField()
+    transaction_uuid = serializers.CharField()

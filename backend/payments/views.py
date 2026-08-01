@@ -49,7 +49,7 @@ class PaymentInitiateAPIView(APIView):
         except Exception:
             pending_payment.delete()
             raise
-        
+
         return Response(
             payment_data,
             status=status.HTTP_200_OK
@@ -69,8 +69,6 @@ from payments.models import Payment, PendingPayment
 from payments.serializers import PaymentVerifySerializer
 from payments.services import EsewaService
 from users.models import Doctor
-
-
 class PaymentVerifyAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -82,36 +80,41 @@ class PaymentVerifyAPIView(APIView):
 
         transaction_uuid = serializer.validated_data["transaction_uuid"]
 
-        # Verify payment with Esewa
-        esewa_response = EsewaService.verify_payment(transaction_uuid)
+        pending_payment = get_object_or_404(
+            PendingPayment,
+            transaction_uuid=transaction_uuid,
+            patient=request.user.patient_profile,
+        )
 
-        if esewa_response["status"] != "COMPLETE":
+        # Verify payment with eSewa
+        esewa_response = EsewaService.verify_payment(
+            transaction_uuid=transaction_uuid,
+            total_amount=settings.CONSULTATION_FEE,
+        )
+
+        if esewa_response.get("status") != "COMPLETE":
             return Response(
                 {
-                    "detail": "Payment not completed."
+                    "detail": "Payment verification failed."
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        # Get pending payment
-        pending_payment.gateway_reference = response["transaction_uuid"]
-        pending_payment.save()
 
         with transaction.atomic():
 
-            # Lock doctor row
+            # Lock doctor row to prevent double booking
             Doctor.objects.select_for_update().get(
                 id=pending_payment.doctor_id
             )
 
-            # Check if slot is still available
+            # Check slot availability again
             appointment_exists = Appointment.objects.filter(
                 doctor=pending_payment.doctor,
                 appointment_date=pending_payment.appointment_date,
             ).exists()
 
             if appointment_exists:
-                # TODO: Refund payment
+                # TODO: Implement refund if payment has already been completed
                 raise ValidationError(
                     "Appointment slot is already booked."
                 )
@@ -123,21 +126,22 @@ class PaymentVerifyAPIView(APIView):
                 appointment_date=pending_payment.appointment_date,
             )
 
-            # Create payment
-            Payment.objects.create(
+            # Create payment record
+            payment = Payment.objects.create(
                 appointment=appointment,
-                transaction_id=transaction_uuid,
+                transaction_id=esewa_response.get("ref_id", transaction_uuid),
                 gateway="esewa",
                 amount=settings.CONSULTATION_FEE,
             )
 
-            # Remove temporary booking
+            # Remove temporary payment record
             pending_payment.delete()
 
         return Response(
             {
                 "message": "Appointment booked successfully.",
-                "appointment_id": appointment.id
+                "appointment_id": appointment.id,
+                "payment_id": payment.id,
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )
