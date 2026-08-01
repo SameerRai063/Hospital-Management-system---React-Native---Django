@@ -1,4 +1,6 @@
 from django.urls import path
+
+from consultation import views
 from .views import PaymentInitiateAPIView, PaymentVerifyAPIView
 
 urlpatterns = [
@@ -12,4 +14,5 @@ urlpatterns = [
         PaymentVerifyAPIView.as_view(),
         name="payment-verify",
     ),
+    path("success/", views.payment_success, name="payment-success"),
 ]

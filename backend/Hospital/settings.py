@@ -185,14 +185,22 @@ ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 # Khalti Sandbox Credentials
 
-KHALTI_SECRET_KEY = "YOUR_KHALTI_TEST_SECRET_KEY"
 
-KHALTI_INITIATE_URL = "https://dev.khalti.com/api/v2/epayment/initiate/"
 
-KHALTI_VERIFY_URL = "https://dev.khalti.com/api/v2/epayment/lookup/"
+# eSewa Configuration
+
+# eSewa Sandbox Configuration
+
+ESEWA_PRODUCT_CODE = "EPAYTEST"
+
+ESEWA_SECRET_KEY = "8gBm/:&EnhH.1/q"
+
+ESEWA_PAYMENT_URL = "https://rc-epay.esewa.com.np/api/epay/main/v2/form"
+
+ESEWA_STATUS_URL = "https://rc.esewa.com.np/api/epay/transaction/status"
 
 CONSULTATION_FEE = 500
 
-WEBSITE_URL = "http://localhost:8000"
+SUCCESS_URL = "http://localhost:8000/api/payments/success/"
 
-KHALTI_RETURN_URL = "http://localhost:8000/api/payments/callback/"
+FAILURE_URL = "http://localhost:8000/api/payments/failure/"

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <title>eSewa Sandbox Test</title>
+  </head>
+
+  <body>
+    <h2>eSewa Sandbox Payment</h2>
+
+    <form
+      action="https://rc-epay.esewa.com.np/api/epay/main/v2/form"
+      method="POST"
+    >
+      <input type="hidden" name="amount" value="500" />
+      <input type="hidden" name="tax_amount" value="0" />
+      <input type="hidden" name="total_amount" value="500" />
+
+      <!-- Replace with YOUR transaction_uuid -->
+      <input
+        type="hidden"
+        name="transaction_uuid"
+        value="785b2168-69db-436c-8dd6-0d6fd7192db1"
+      />
+
+      <input type="hidden" name="product_code" value="EPAYTEST" />
+
+      <input type="hidden" name="product_service_charge" value="0" />
+
+      <input type="hidden" name="product_delivery_charge" value="0" />
+
+      <input
+        type="hidden"
+        name="success_url"
+        value="http://localhost:8000/api/payments/success/"
+      />
+
+      <input
+        type="hidden"
+        name="failure_url"
+        value="http://localhost:8000/api/payments/failure/"
+      />
+
+      <input
+        type="hidden"
+        name="signed_field_names"
+        value="total_amount,transaction_uuid,product_code"
+      />
+
+      <!-- Replace with YOUR signature -->
+      <input
+        type="hidden"
+        name="signature"
+        value="P0C3lkf5I0zVUHncXHCtC4qaLgaADVBeyPplpDv/3Pk="
+      />
+
+      <button type="submit">Pay with eSewa Sandbox</button>
+    </form>
+  </body>
+</html>
