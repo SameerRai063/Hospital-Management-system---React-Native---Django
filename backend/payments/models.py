@@ -5,7 +5,7 @@ from appointments.models import Appointment
 class Payment(models.Model):
 
     GATEWAY_CHOICES = [
-        ("khalti", "Khalti"),
+        ("esewa", "Esewa"),
     ]
 
     appointment = models.OneToOneField(
@@ -56,6 +56,9 @@ class PendingPayment(models.Model):
     unique=True,
     blank=True,
     null=True
+)
+    transaction_uuid = models.UUIDField(
+    unique=True
 )
 
     created_at = models.DateTimeField(

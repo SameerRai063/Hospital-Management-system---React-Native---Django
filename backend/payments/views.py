@@ -1,16 +1,20 @@
+from django.http import response
 from django.shortcuts import render
 
 # Create your views here.
+import uuid
+
+from django.shortcuts import get_object_or_404
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 from users.models import Doctor
 from payments.models import PendingPayment
 from payments.serializers import PaymentInitiateSerializer
-from payments.services import KhaltiService
+from payments.services import EsewaService
 
 class PaymentInitiateAPIView(APIView):
 
@@ -19,37 +23,35 @@ class PaymentInitiateAPIView(APIView):
     def post(self, request):
 
         serializer = PaymentInitiateSerializer(data=request.data)
-
         serializer.is_valid(raise_exception=True)
-
-        doctor_id = serializer.validated_data["doctor"]
-        appointment_date = serializer.validated_data["appointment_date"]
 
         patient = request.user.patient_profile
 
         doctor = get_object_or_404(
-        Doctor,
-        id=doctor_id
-)
-
-        pending_payment = PendingPayment.objects.create(
-            patient=patient,
-            doctor=doctor,
-            appointment_date=appointment_date,
+            Doctor,
+            id=serializer.validated_data["doctor"]
         )
 
-        response = KhaltiService.initiate_payment(
-            pending_payment=pending_payment,
-            customer_name=request.user.get_full_name(),
-            customer_email=request.user.email,
-            customer_phone=request.user.phone_number,
-        )
+        appointment_date = serializer.validated_data["appointment_date"]
 
-        pending_payment.gateway_reference = response["pidx"]
-        pending_payment.save()
+        transaction_uuid = uuid.uuid4()
+        try:
+            pending_payment = PendingPayment.objects.create(
+                patient=patient,
+                doctor=doctor,
+                appointment_date=appointment_date,
+                transaction_uuid=transaction_uuid,
+            )
 
+            payment_data = EsewaService.create_payment_data(
+                pending_payment
+            )
+        except Exception:
+            pending_payment.delete()
+            raise
+        
         return Response(
-            response,
+            payment_data,
             status=status.HTTP_200_OK
         )
 from django.conf import settings
@@ -65,7 +67,7 @@ from rest_framework.views import APIView
 from appointments.models import Appointment
 from payments.models import Payment, PendingPayment
 from payments.serializers import PaymentVerifySerializer
-from payments.services import KhaltiService
+from payments.services import EsewaService
 from users.models import Doctor
 
 
@@ -78,12 +80,12 @@ class PaymentVerifyAPIView(APIView):
         serializer = PaymentVerifySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        pidx = serializer.validated_data["pidx"]
+        transaction_uuid = serializer.validated_data["transaction_uuid"]
 
-        # Verify payment with Khalti
-        khalti_response = KhaltiService.verify_payment(pidx)
+        # Verify payment with Esewa
+        esewa_response = EsewaService.verify_payment(transaction_uuid)
 
-        if khalti_response.get("status") != "Completed":
+        if esewa_response["status"] != "COMPLETE":
             return Response(
                 {
                     "detail": "Payment not completed."
@@ -92,11 +94,8 @@ class PaymentVerifyAPIView(APIView):
             )
 
         # Get pending payment
-        pending_payment = get_object_or_404(
-            PendingPayment,
-            gateway_reference=pidx,
-            patient=request.user.patient_profile
-        )
+        pending_payment.gateway_reference = response["transaction_uuid"]
+        pending_payment.save()
 
         with transaction.atomic():
 
@@ -127,8 +126,8 @@ class PaymentVerifyAPIView(APIView):
             # Create payment
             Payment.objects.create(
                 appointment=appointment,
-                transaction_id=pidx,
-                gateway="khalti",
+                transaction_id=transaction_uuid,
+                gateway="esewa",
                 amount=settings.CONSULTATION_FEE,
             )
 
