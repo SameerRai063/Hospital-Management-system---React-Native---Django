@@ -1,7 +1,5 @@
 from django.urls import path
-
-from consultation import views
-from .views import PaymentInitiateAPIView, PaymentVerifyAPIView
+from .views import PaymentInitiateAPIView, PaymentVerifyAPIView,PaymentSuccessAPIView
 
 urlpatterns = [
     path(
@@ -14,5 +12,7 @@ urlpatterns = [
         PaymentVerifyAPIView.as_view(),
         name="payment-verify",
     ),
-    path("success/", views.payment_success, name="payment-success"),
+        path("success/", PaymentSuccessAPIView.as_view(), name="payment-success"),
+    #path("failure/", PaymentFailureAPIView.as_view(), name="payment-failure"),
+    
 ]
