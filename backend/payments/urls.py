@@ -7,11 +7,6 @@ urlpatterns = [
         PaymentInitiateAPIView.as_view(),
         name="payment-initiate",
     ),
-    path(
-        "verify/",
-        PaymentVerifyAPIView.as_view(),
-        name="payment-verify",
-    ),
         path("success/", PaymentSuccessAPIView.as_view(), name="payment-success"),
     #path("failure/", PaymentFailureAPIView.as_view(), name="payment-failure"),
     
