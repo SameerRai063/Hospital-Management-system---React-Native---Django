@@ -1,9 +1,16 @@
 from rest_framework import serializers
 
-from appointments.models import Appointment
+from consultations.models import Consultation
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
+class ConsultationSerializer(serializers.ModelSerializer):
+
+    consultation_id = serializers.CharField(read_only=True)
+
+    appointment_id = serializers.CharField(
+        source="appointment.appointment_id",
+        read_only=True,
+    )
 
     doctor = serializers.CharField(
         source="doctor.user.get_full_name",
@@ -16,14 +23,13 @@ class AppointmentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Appointment
+        model = Consultation
         fields = [
+            "consultation_id",
             "appointment_id",
             "doctor",
             "patient",
-            "appointment_date",
-            "status",
+            "medicines",
+            "timing",
             "notes",
-            "created_at",
-            "updated_at",
         ]

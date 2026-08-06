@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -8,6 +7,8 @@ from rest_framework.views import APIView
 
 from appointments.models import Appointment
 from appointments.serializer import AppointmentSerializer
+from users.permissions import IsDoctor
+
 
 class AppointmentListAPIView(APIView):
 
@@ -23,6 +24,8 @@ class AppointmentListAPIView(APIView):
         )
 
         return Response(serializer.data)
+
+
 class MyAppointmentAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -41,6 +44,8 @@ class MyAppointmentAPIView(APIView):
         )
 
         return Response(serializer.data)
+
+
 class DoctorAppointmentAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -59,6 +64,8 @@ class DoctorAppointmentAPIView(APIView):
         )
 
         return Response(serializer.data)
+
+
 class AppointmentDeleteAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -69,7 +76,7 @@ class AppointmentDeleteAPIView(APIView):
 
             appointment = get_object_or_404(
                 Appointment,
-                id=appointment_id,
+                appointment_id=appointment_id,
                 patient=request.user.patient_profile,
             )
 
@@ -77,7 +84,7 @@ class AppointmentDeleteAPIView(APIView):
 
             appointment = get_object_or_404(
                 Appointment,
-                id=appointment_id,
+                appointment_id=appointment_id,
                 doctor=request.user.doctor_profile,
             )
 
@@ -95,6 +102,39 @@ class AppointmentDeleteAPIView(APIView):
         return Response(
             {
                 "message": "Appointment deleted successfully."
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class AppointmentCompleteAPIView(APIView):
+
+    permission_classes = [IsAuthenticated, IsDoctor]
+
+    def put(self, request, appointment_id):
+
+        appointment = get_object_or_404(
+            Appointment,
+            appointment_id=appointment_id,
+            doctor=request.user.doctor_profile,
+        )
+
+        if appointment.status == "completed":
+
+            return Response(
+                {
+                    "detail": "Appointment is already completed."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        appointment.status = "completed"
+        appointment.save()
+
+        return Response(
+            {
+                "message": "Appointment marked as completed.",
+                "appointment": AppointmentSerializer(appointment).data,
             },
             status=status.HTTP_200_OK,
         )

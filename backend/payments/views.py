@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from appointments.models import Appointment
 from payments.models import Payment, PendingPayment
-from payments.serializers import PaymentInitiateSerializer, PaymentVerifySerializer
+from payments.serializers import PaymentInitiateSerializer
 from payments.services import EsewaService
 from users.models import Doctor
 
@@ -133,7 +133,7 @@ class PaymentSuccessAPIView(APIView):
         return Response(
     {
         "message": "Appointment booked successfully.",
-        "appointment_id": appointment.id,
+        "appointment_id": appointment.appointment_id,
     },
     status=status.HTTP_201_CREATED,
 )

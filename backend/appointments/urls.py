@@ -28,8 +28,10 @@ urlpatterns = [
     ),
 
     path(
-        "delete/<int:appointment_id>/",
-        AppointmentDeleteAPIView.as_view(),
-        name="appointment-delete",
-    ),
+    "delete/<str:appointment_id>/",
+    AppointmentDeleteAPIView.as_view(),
+    name="appointment-delete",
+),
+
+
 ]
