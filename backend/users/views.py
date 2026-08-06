@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import IsAdmin
@@ -41,7 +39,7 @@ class DeletePatientAPIView(DestroyAPIView):
 class UpdatePatientAPIView(UpdateAPIView):
     queryset = Patient.objects.select_related("user")
     serializer_class = UpdatePatientSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrPatientOwner]
+    permission_classes = [IsAuthenticated, IsAdmin]
     lookup_field = "id"
 
 #Doctor Views------------------------------------------------------------------------------------------------------

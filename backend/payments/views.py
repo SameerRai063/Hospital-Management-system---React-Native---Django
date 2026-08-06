@@ -1,20 +1,19 @@
-from django.http import response
-from django.shortcuts import render
-
-# Create your views here.
+import base64
+import json
 import uuid
-
-from django.shortcuts import get_object_or_404
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
+from django.db import transaction
+from django.shortcuts import get_object_or_404, render
 from rest_framework import status
-
-from users.models import Doctor
-from payments.models import PendingPayment
-from payments.serializers import PaymentInitiateSerializer
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from appointments.models import Appointment
+from payments.models import Payment, PendingPayment
+from payments.serializers import PaymentInitiateSerializer, PaymentVerifySerializer
 from payments.services import EsewaService
+from users.models import Doctor
 
 class PaymentInitiateAPIView(APIView):
 
@@ -54,27 +53,6 @@ class PaymentInitiateAPIView(APIView):
             payment_data,
             status=status.HTTP_200_OK
         )
-from django.conf import settings
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from appointments.models import Appointment
-from payments.models import Payment, PendingPayment
-from payments.serializers import PaymentVerifySerializer
-from payments.services import EsewaService
-from users.models import Doctor
-
-import base64
-import json
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 
 
 class PaymentSuccessAPIView(APIView):
