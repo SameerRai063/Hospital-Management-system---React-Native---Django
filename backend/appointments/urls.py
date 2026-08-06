@@ -1,5 +1,35 @@
-from django.conf.urls import include, static
-from django.contrib import admin
 from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-path = []
+
+from appointments.views import (
+    AppointmentListAPIView,
+    MyAppointmentAPIView,
+    DoctorAppointmentAPIView,
+    AppointmentDeleteAPIView,
+)
+
+urlpatterns = [
+
+    path(
+        "",
+        AppointmentListAPIView.as_view(),
+        name="appointment-list",
+    ),
+
+    path(
+        "my/",
+        MyAppointmentAPIView.as_view(),
+        name="my-appointments",
+    ),
+
+    path(
+        "doctor/",
+        DoctorAppointmentAPIView.as_view(),
+        name="doctor-appointments",
+    ),
+
+    path(
+        "delete/<int:appointment_id>/",
+        AppointmentDeleteAPIView.as_view(),
+        name="appointment-delete",
+    ),
+]
