@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from consultation.models import Consultation
 from consultation.serializer import ConsultationSerializer
-from users.permissions import IsDoctor
+from users.permissions import IsDoctor, IsPatient
 
 class ConsultationListAPIView(APIView):
 
@@ -26,7 +26,7 @@ class ConsultationListAPIView(APIView):
 
 class MyConsultationAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsPatient]
 
     def get(self, request):
 
@@ -43,7 +43,7 @@ class MyConsultationAPIView(APIView):
 
 class DoctorConsultationAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsDoctor]
 
     def get(self, request):
 
@@ -83,7 +83,7 @@ class ConsultationUpdateAPIView(APIView):
 
 class ConsultationDeleteAPIView(APIView):
 
-    permission_classes = [IsAuthenticated, IsDoctor]
+    permission_classes = [IsAuthenticated, IsDoctor,IsPatient]
 
     def delete(self, request, consultation_id):
 

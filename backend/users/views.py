@@ -5,7 +5,7 @@ from users.permissions import IsAdmin
 from users.serializer import PatientRegisterSerializer
 from .models import Doctor, Patient
 from .serializer import DoctorCreateSerializer, DoctorSerializer, PatientListSerializer, UpdateDoctorSerializer, UpdatePatientSerializer
-from .permissions import IsAdmin,IsAdminOrDoctorOwner, IsAdminOrPatientOwner
+from .permissions import IsAdmin, IsDoctor
 #Patient Views
 class PatientRegisterView(CreateAPIView):
     serializer_class = PatientRegisterSerializer
@@ -56,7 +56,7 @@ class DoctorListAPIView(ListAPIView):
 class DoctorDetailAPIView(RetrieveAPIView):
     queryset = Doctor.objects.select_related("user").all()
     serializer_class = DoctorSerializer
-    permission_classes = [IsAuthenticated, IsAdmin]
+    permission_classes = [IsDoctor or IsAdmin]
     lookup_field = "id"
 
 class DeleteDoctorAPIView(DestroyAPIView):
@@ -76,5 +76,5 @@ class DeleteDoctorAPIView(DestroyAPIView):
 class UpdateDoctorAPIView(UpdateAPIView):
     queryset = Doctor.objects.select_related("user")
     serializer_class = UpdateDoctorSerializer
-    permission_classes = [IsAdminOrDoctorOwner]
+    permission_classes = [IsAdmin or IsAuthenticated]
     lookup_field = "id"

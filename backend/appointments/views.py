@@ -7,12 +7,12 @@ from rest_framework.views import APIView
 
 from appointments.models import Appointment
 from appointments.serializer import AppointmentSerializer
-from users.permissions import IsDoctor
+from users.permissions import IsDoctor,IsAdmin,IsPatient
 
-
+#List all the appointments in the system
 class AppointmentListAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated and IsAdmin]
 
     def get(self, request):
 
@@ -25,10 +25,10 @@ class AppointmentListAPIView(APIView):
 
         return Response(serializer.data)
 
-
+#Logged in patient's appointments
 class MyAppointmentAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated and IsPatient]
 
     def get(self, request):
 
@@ -45,10 +45,10 @@ class MyAppointmentAPIView(APIView):
 
         return Response(serializer.data)
 
-
+#Logged in doctor's appointments
 class DoctorAppointmentAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated and IsDoctor]
 
     def get(self, request):
 
@@ -65,10 +65,10 @@ class DoctorAppointmentAPIView(APIView):
 
         return Response(serializer.data)
 
-
+#Delete the appointment
 class AppointmentDeleteAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsAdmin]
 
     def delete(self, request, appointment_id):
 
@@ -109,7 +109,7 @@ class AppointmentDeleteAPIView(APIView):
 
 class AppointmentCompleteAPIView(APIView):
 
-    permission_classes = [IsAuthenticated, IsDoctor]
+    permission_classes = [IsAuthenticated and IsDoctor]
 
     def put(self, request, appointment_id):
 

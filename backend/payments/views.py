@@ -10,10 +10,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from appointments.models import Appointment
+from backend.users.permissions import IsAdmin
 from payments.models import Payment, PendingPayment
 from payments.serializers import PaymentInitiateSerializer
 from payments.services import EsewaService
 from users.models import Doctor
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from payments.models import Payment
+from payments.serializers import PaymentSerializer
 
 class PaymentInitiateAPIView(APIView):
 
@@ -137,3 +144,55 @@ class PaymentSuccessAPIView(APIView):
     },
     status=status.HTTP_201_CREATED,
 )
+
+class PaymentDeleteAPIView(APIView):
+
+    permission_classes = [IsAuthenticated and IsAdmin]
+
+    def delete(self, request, transaction_id):
+
+        payment = get_object_or_404(
+            Payment,
+            transaction_id=transaction_id,
+        )
+
+        payment.delete()
+
+        return Response(
+            {
+                "message": "Payment deleted successfully."
+            },
+            status=status.HTTP_200_OK,
+        )
+class PaymentListAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        payments = Payment.objects.all()
+
+        serializer = PaymentSerializer(
+            payments,
+            many=True,
+        )
+
+        return Response(serializer.data)
+class MyPaymentAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        patient = request.user.patient_profile
+
+        payments = Payment.objects.filter(
+            appointment__patient=patient
+        )
+
+        serializer = PaymentSerializer(
+            payments,
+            many=True,
+        )
+
+        return Response(serializer.data)
