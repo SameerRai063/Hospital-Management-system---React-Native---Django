@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from appointments.models import Appointment
-from backend.users.permissions import IsAdmin, IsPatient
+from users.permissions import IsAdmin, IsPatient
 from payments.models import Payment, PendingPayment
 from payments.serializers import PaymentInitiateSerializer
 from payments.services import EsewaService

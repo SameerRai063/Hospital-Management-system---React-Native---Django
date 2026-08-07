@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -85,7 +86,7 @@ TEMPLATES = [
         },
     },
 ]
-
+ASGI_APPLICATION = "Hospital.asgi.application"
 WSGI_APPLICATION = 'Hospital.wsgi.application'
 
 
@@ -204,3 +205,15 @@ CONSULTATION_FEE = 500
 SUCCESS_URL = "http://localhost:8000/api/payments/success/"
 
 FAILURE_URL = "http://localhost:8000/api/payments/failure/"
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                ("127.0.0.1", 6379)
+            ],
+        },
+    },
+}

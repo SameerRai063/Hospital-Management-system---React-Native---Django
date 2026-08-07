@@ -17,7 +17,10 @@ urlpatterns = [
     #path("api/appointments/", include("appointments.urls")),
     #path("api/reviews/", include("reviews.urls")),
     path("api/payments/", include("payments.urls")),
-
+    path(
+    "api/chat/",
+    include("chat.urls")
+),
     # Allauth
     path("accounts/", include("allauth.urls")),
 

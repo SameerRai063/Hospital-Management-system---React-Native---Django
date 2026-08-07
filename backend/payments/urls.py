@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MyPaymentAPIView, PaymentDeleteAPIView, PaymentInitiateAPIView, PaymentListAPIView,PaymentSuccessAPIView, PaymentFailureAPIView
+from payments.views import MyPaymentAPIView, PaymentDeleteAPIView, PaymentInitiateAPIView, PaymentListAPIView,PaymentSuccessAPIView, PaymentFailureAPIView
 
 urlpatterns = [
     path("initiate/",PaymentInitiateAPIView.as_view(),name="payment-initiate",),

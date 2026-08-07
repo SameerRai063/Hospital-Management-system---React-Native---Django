@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.payments.models import Payment
+from .models import Payment
 
 
 class PaymentInitiateSerializer(serializers.Serializer):

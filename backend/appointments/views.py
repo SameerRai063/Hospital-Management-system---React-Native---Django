@@ -68,7 +68,7 @@ class DoctorAppointmentAPIView(APIView):
 #Delete the appointment
 class AppointmentDeleteAPIView(APIView):
 
-    permission_classes = [IsAuthenticated,IsAdmin]
+    permission_classes = [IsAuthenticated and IsAdmin]
 
     def delete(self, request, appointment_id):
 
@@ -106,7 +106,7 @@ class AppointmentDeleteAPIView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
+#Mark the appointment as completed by Doctor
 class AppointmentCompleteAPIView(APIView):
 
     permission_classes = [IsAuthenticated and IsDoctor]
