@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from appointments.models import Appointment
-from backend.users.permissions import IsAdmin
+from backend.users.permissions import IsAdmin, IsPatient
 from payments.models import Payment, PendingPayment
 from payments.serializers import PaymentInitiateSerializer
 from payments.services import EsewaService
@@ -144,6 +144,52 @@ class PaymentSuccessAPIView(APIView):
     },
     status=status.HTTP_201_CREATED,
 )
+class PaymentFailureAPIView(APIView):
+
+    permission_classes = []
+
+    def get(self, request):
+
+        encoded_data = request.GET.get("data")
+
+        if not encoded_data:
+            return Response(
+                {"detail": "No payment data received."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            decoded_data = base64.b64decode(
+                encoded_data
+            ).decode("utf-8")
+
+            payment_data = json.loads(decoded_data)
+
+            transaction_uuid = payment_data["transaction_uuid"]
+
+            pending_payment = get_object_or_404(
+                PendingPayment,
+                transaction_uuid=transaction_uuid,
+            )
+
+            # Delete temporary payment record
+            pending_payment.delete()
+
+            return Response(
+                {
+                    "message": "Payment failed. Appointment was not booked.",
+                    "transaction_uuid": transaction_uuid,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except (ValueError, KeyError, json.JSONDecodeError):
+            return Response(
+                {
+                    "detail": "Invalid payment data."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 class PaymentDeleteAPIView(APIView):
 
@@ -166,7 +212,7 @@ class PaymentDeleteAPIView(APIView):
         )
 class PaymentListAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated and IsAdmin]
 
     def get(self, request):
 
@@ -180,7 +226,7 @@ class PaymentListAPIView(APIView):
         return Response(serializer.data)
 class MyPaymentAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated and IsPatient]
 
     def get(self, request):
 
